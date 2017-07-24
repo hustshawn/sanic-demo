@@ -6,24 +6,30 @@ from bp_cookie import bp_cookie
 app = Sanic(__name__)
 app.blueprint(bp_cookie)
 
+# Tasks
 async def notify_server_started_after_five_seconds():
     await asyncio.sleep(2)
     print('Server successfully started!')
 
 app.add_task(notify_server_started_after_five_seconds())
 
+# Middlewares
 @app.middleware('request')
 async def print_on_request(request):
     print("[Middleware] Pre-processing the request...")
+    print("Reuqest headers: ", request.headers)
 
 @app.middleware('response')
 async def print_on_response(request, response):
     print("[Middleware] Post-processing the response...")
 
+# End of Middlewares
+
+
+# Views
 @app.route("/")
 async def test(request):
-    # return text("Hello world!")
-    return json({"hello": "world!"})
+    return json({"Response": "Hello world!"})
 
 @app.route('/tag/<tag>')
 async def tag_handler(request, tag):
@@ -71,7 +77,7 @@ def query_string(request):
 def post_json(request):
     return json({ "received": True, "form_data": request.form, "test": request.form.get('test') })
 
-
+# End of Views
 
 app.run(host='0.0.0.0', port=8088, debug=True)
 
